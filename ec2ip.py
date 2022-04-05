@@ -1,7 +1,7 @@
 import boto3
 import os
 
-INSTANCE_ID = os.getenv('EC2ID')
+INSTANCE_ID = os.getenv('EC2_ID')
 
 
 def get_public_ip(instance_id):

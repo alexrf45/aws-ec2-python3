@@ -1,13 +1,21 @@
+#!/usr/bin/env python3
+
+
+AWS_REGION = "us-east-1"
+EC2_RESOURCE = boto3.resource('ec2', region_name=AWS_REGION)
+KEY_PAIR_NAME = 'aws-ec2'
+AMI_ID = 'ami-07d02ee1eeb0c996c'
+
+
 import boto3
 
 def create_instance():
-    ec2_client = boto3.client("ec2", region_name="us-east-1")
-    instances = ec2_client.run_instances(
-        ImageId="ami-03190fe20ef6b1419",
+    instances = EC2_RESOURCE.create_instances(
         MinCount=1,
         MaxCount=1,
-        InstanceType="t4g.nano",
-        KeyName = input("enter key pair name:")
+        ImageId=AMI_ID,
+        InstanceType="t3.micro",
+        KeyName=KEY_PAIR_NAME
     )
 
     print(instances["Instances"][0]["InstanceId"])
