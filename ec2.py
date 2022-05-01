@@ -14,7 +14,7 @@ RUNID = 'ec2-1'
 SUBNET_ID = 'subnet-015577d4fd9d3c6f4'
 SECURITY_GROUPS_IDS = ['sg-020b599f4216e36ae']
 PUBLIC_IP = None
-ROLE_PROFILE = 'EC2_ROLE'
+ROLE_PROFILE = 'EC2_Role'
  
 USERDATA_SCRIPT = '''
 # Install awscli
