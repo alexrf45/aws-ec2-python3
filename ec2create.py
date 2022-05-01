@@ -14,7 +14,7 @@ def create_instance():
         MinCount=1,
         MaxCount=1,
         ImageId=AMI_ID,
-        InstanceType="t3.micro",
+        InstanceType="t3a.medium",
         KeyName=KEY_PAIR_NAME
     )
 
