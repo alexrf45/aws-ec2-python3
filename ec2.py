@@ -84,10 +84,7 @@ def launch_ec2_instance():
             }
         },
     ]
-    iamInstanceProfile = {
-        'Name': ROLE_PROFILE
-    }
- 
+
     # Create Elastic/Public IP for instance
     if PUBLIC_IP:
         networkInterfaces = [
@@ -102,7 +99,6 @@ def launch_ec2_instance():
                                         InstanceType=INSTANCE_TYPE,
                                         NetworkInterfaces=networkInterfaces,
                                         UserData=USERDATA_SCRIPT,
-                                        IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
@@ -112,7 +108,6 @@ def launch_ec2_instance():
                                         SubnetId=SUBNET_ID,
                                         SecurityGroupIds=SECURITY_GROUPS_IDS,
                                         UserData=USERDATA_SCRIPT,
-                                        IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
