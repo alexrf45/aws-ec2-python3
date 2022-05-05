@@ -14,10 +14,8 @@ RUNID = 'ec2-1'
 SUBNET_ID = 'subnet-015577d4fd9d3c6f4'
 SECURITY_GROUPS_IDS = ['sg-020b599f4216e36ae']
 PUBLIC_IP = None
-ROLE_PROFILE = 'EC2_Role'
-KEY_PAIR_NAME= 'aws-roland-lab'
+KEY_PAIR_NAME= 'bug bounty'
 USERDATA_SCRIPT = '''
-# Install awscli
 sudo apt-get update && sudo apt-get install wget git python3
 
  
