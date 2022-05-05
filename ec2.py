@@ -15,7 +15,7 @@ SUBNET_ID = 'subnet-015577d4fd9d3c6f4'
 SECURITY_GROUPS_IDS = ['sg-020b599f4216e36ae']
 PUBLIC_IP = None
 ROLE_PROFILE = 'EC2_Role'
- 
+KEY_PAIR_NAME= 'aws-roland-lab'
 USERDATA_SCRIPT = '''
 # Install awscli
 sudo apt-get update && sudo apt-get install wget git python3
@@ -34,7 +34,7 @@ def create_ec2_resource():
  
     print("Attempting to create ec2 ressource on region: %s" % REGION)
  
-    session = boto3.Session(region_name = REGION, profile_name='EC2-Admin')
+    session = boto3.Session(region_name = REGION, profile_name='Administrator')
     # session = boto3.Session(region_name=REGION)
  
     ec2 = session.resource('ec2')
@@ -104,6 +104,7 @@ def launch_ec2_instance():
                                         UserData=USERDATA_SCRIPT,
                                         IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
+                                        KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
     else:
         instance = ec2.create_instances(ImageId=AMI_IMAGE_ID,
@@ -113,6 +114,7 @@ def launch_ec2_instance():
                                         UserData=USERDATA_SCRIPT,
                                         IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
+                                        KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
     if instance is None:
         raise Exception("Failed to create instance! Check the AWS console to verify creation or try again")
