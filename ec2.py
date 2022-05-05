@@ -34,7 +34,11 @@ def create_ec2_resource():
  
     print("Attempting to create ec2 ressource on region: %s" % REGION)
  
+<<<<<<< HEAD
     session = boto3.Session(region_name = REGION, profile_name='Administrator')
+=======
+    session = boto3.Session(region_name = REGION, profile_name='aws-roland')
+>>>>>>> c6a863561e4ff76708c7b2526efb67921ad49a66
     # session = boto3.Session(region_name=REGION)
  
     ec2 = session.resource('ec2')
@@ -84,10 +88,7 @@ def launch_ec2_instance():
             }
         },
     ]
-    iamInstanceProfile = {
-        'Name': ROLE_PROFILE
-    }
- 
+
     # Create Elastic/Public IP for instance
     if PUBLIC_IP:
         networkInterfaces = [
@@ -102,7 +103,6 @@ def launch_ec2_instance():
                                         InstanceType=INSTANCE_TYPE,
                                         NetworkInterfaces=networkInterfaces,
                                         UserData=USERDATA_SCRIPT,
-                                        IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
@@ -112,7 +112,6 @@ def launch_ec2_instance():
                                         SubnetId=SUBNET_ID,
                                         SecurityGroupIds=SECURITY_GROUPS_IDS,
                                         UserData=USERDATA_SCRIPT,
-                                        IamInstanceProfile=iamInstanceProfile,
                                         MinCount=1, MaxCount=1,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
