@@ -34,11 +34,7 @@ def create_ec2_resource():
  
     print("Attempting to create ec2 ressource on region: %s" % REGION)
  
-<<<<<<< HEAD
-    session = boto3.Session(region_name = REGION, profile_name='Administrator')
-=======
     session = boto3.Session(region_name = REGION, profile_name='aws-roland')
->>>>>>> c6a863561e4ff76708c7b2526efb67921ad49a66
     # session = boto3.Session(region_name=REGION)
  
     ec2 = session.resource('ec2')
