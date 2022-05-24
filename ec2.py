@@ -8,16 +8,15 @@ AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
 INSTANCE_TYPE = 't3a.medium'
 DISK_SIZE_GB = 20
 DEVICE_NAME = '/dev/xvda'
-NAME = 'roland-vps'
+NAME = 'cyber-ram'
 OWNER = 'roland'
 RUNID = 'ec2-1'
 SUBNET_ID = 'subnet-015577d4fd9d3c6f4'
 SECURITY_GROUPS_IDS = ['sg-020b599f4216e36ae']
 PUBLIC_IP = None
-KEY_PAIR_NAME= 'bug bounty'
+KEY_PAIR_NAME= 'aws-ec2'
 USERDATA_SCRIPT = '''
-sudo apt-get update && sudo apt-get install wget git python3
-
+sudo apt-get update && sudo apt-get install wget git python3 nginx certbot
  
 # Install Docker on ec2 instance:
 curl -fsSL https://get.docker.com -o get-docker.sh
