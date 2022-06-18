@@ -2,7 +2,8 @@
 
 import boto3
 from time import sleep
- 
+import os
+
 REGION = 'us-east-1'
 AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
 INSTANCE_TYPE = 't3a.medium'
@@ -11,8 +12,8 @@ DEVICE_NAME = '/dev/xvda'
 NAME = 'ec2demo002'
 OWNER = 'ec2demouser'
 RUNID = 'ec2-1'
-SUBNET_ID = 'subnet-0883483eb9a1bacfb'
-SECURITY_GROUPS_IDS = ['sg-08bb84d24f9e3cd03']
+SUBNET_ID = os.environ["EC2_SUBNET"]
+SECURITY_GROUPS_IDS = [os.environ["EC2_SG"]]
 PUBLIC_IP = None
 KEY_PAIR_NAME= 'ec2-demo002'
 USERDATA_SCRIPT = '''
@@ -29,7 +30,7 @@ sudo usermod -aG docker $USER
  
 def create_ec2_resource():
  
-    print("Attempting to create ec2 ressource on region: %s" % REGION)
+    print("Attempting to create ec2 resource on region: %s" % REGION)
  
     session = boto3.Session(region_name = REGION, profile_name='EC2-Admin')
     # session = boto3.Session(region_name=REGION)
