@@ -8,13 +8,13 @@ AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
 INSTANCE_TYPE = 't3a.medium'
 DISK_SIZE_GB = 20
 DEVICE_NAME = '/dev/xvda'
-NAME = 'cyber-ram'
-OWNER = 'roland'
+NAME = 'ec2demo002'
+OWNER = 'ec2demouser'
 RUNID = 'ec2-1'
-SUBNET_ID = 'subnet-015577d4fd9d3c6f4'
-SECURITY_GROUPS_IDS = ['sg-020b599f4216e36ae']
+SUBNET_ID = 'subnet-0883483eb9a1bacfb'
+SECURITY_GROUPS_IDS = ['sg-08bb84d24f9e3cd03']
 PUBLIC_IP = None
-KEY_PAIR_NAME= 'aws-ec2'
+KEY_PAIR_NAME= 'ec2-demo002'
 USERDATA_SCRIPT = '''
 sudo apt-get update && sudo apt-get install wget git python3 nginx certbot
  
