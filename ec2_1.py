@@ -8,7 +8,7 @@ import subprocess
 
 REGION = 'us-east-1'
 AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
-INSTANCE_TYPE = 't3a.medium'
+INSTANCE_TYPE = 't2.micro'
 DISK_SIZE_GB = 20
 DEVICE_NAME = '/dev/xvda'
 NAME = 'ec2-demo' #tag
