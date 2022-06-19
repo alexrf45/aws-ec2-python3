@@ -19,7 +19,7 @@ def delete_key_pair():
 
 delete_key_pair()
 
-sleep(40)
+sleep(60)
 
 def delete_security_group():
     ec2_client = boto3.client("ec2", region_name="us-east-1")

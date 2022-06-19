@@ -38,7 +38,10 @@ def create_key_pair():
         TagSpecifications=[{'ResourceType': 'key-pair','Tags': [{'Key': 'Name','Value': 'ec2-demo'},]},] )
         # print({key_pair.key_material})
     outfile.write(f"{key_pair.key_material}")
+
+
 create_key_pair()
+
 #Reference: https://www.edureka.co/community/87793/create-a-security-group-and-rules-using-boto3-module
 
 def ec2_security_group(): #creates a default security group for ssh access
@@ -53,7 +56,7 @@ def ec2_security_group(): #creates a default security group for ssh access
         security_group_id = response['GroupId']
         print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id)) 
 
-        response = ec2_client.authorize_security_group_ingress( #creates ssh rule & attachess to security group
+        response = ec2_client.authorize_security_group_ingress( #creates ssh rule
             GroupId=security_group_id,
             IpPermissions=[
                 {'IpProtocol': 'tcp',
@@ -77,7 +80,7 @@ def create_ec2_resource(): #Connects to the ec2 boto3 client with Demo IAM User.
     ec2 = session.resource('ec2')
  
     if ec2 is None:
-        raise ConnectionError("Could not create ec2 resource! Check your connection or aws config!")
+        raise ConnectionError("Could not create ec2 resource!")
  
     return ec2
  
