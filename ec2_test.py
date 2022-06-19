@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import boto3
-from time import sleep
+from botocore.exceptions import ClientError
+from time import sleep #allows script execution to pause as AWS CLI execution on AWS servers are not always instant. 
 import os
 import subprocess
 
@@ -10,26 +11,63 @@ AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
 INSTANCE_TYPE = 't3a.medium'
 DISK_SIZE_GB = 20
 DEVICE_NAME = '/dev/xvda'
-NAME = 'ec2demo005'
-OWNER = 'ec2demouser1'
-RUNID = 'ec2-1'
-SUBNET_ID = os.environ["EC2_SUBNET"]
-SECURITY_GROUPS_IDS = [os.environ["EC2_SG"]]
+NAME = 'ec2-demo' #tag
+OWNER = 'ec2demouser' #tag
+RUNID = 'ec2-1' #tag
 PUBLIC_IP = None
-KEY_PAIR_NAME= 'ec2-demo003'
+KEY_PAIR_NAME= 'ec2-demo'
 USERDATA_SCRIPT = '''
-sudo apt-get update && sudo apt-get install wget git python3 nginx certbot
- 
+#!/bin/bash
+sudo apt-get update && sudo apt-get install -y wget git python3 nginx certbot
 # Install Docker on ec2 instance:
 curl -fsSL https://get.docker.com -o get-docker.sh
-
 sh get-docker.sh
-
 sudo usermod -aG docker $USER
 '''
- 
- 
-def create_ec2_resource():
+min_count = 1 #Minimum number of ec2 instances created
+max_count = 1 #Maximum number of ec2 instances created
+
+
+## This function creates a keypair and saves it in the current directory as a .pem file
+def create_key_pair():
+    ec2_client = boto3.resource("ec2", region_name="us-east-1")
+    outfile = open('ec2demo.pem', 'w')
+    key_pair = ec2_client.create_key_pair(
+        KeyName='ec2-demo',
+        KeyType='ed25519',
+        TagSpecifications=[{'ResourceType': 'key-pair','Tags': [{'Key': 'Name','Value': 'ec2-demo'},]},] )
+        # print({key_pair.key_material})
+    outfile.write(f"{key_pair.key_material}")
+create_key_pair()
+#Reference: https://www.edureka.co/community/87793/create-a-security-group-and-rules-using-boto3-module
+
+def ec2_security_group(): #creates a default security group for ssh access
+    ec2_client = boto3.client("ec2", region_name="us-east-1")
+    response = ec2_client.describe_vpcs()
+    vpc_id = response.get('Vpcs', [{}])[1].get('VpcId', '') #queries second vpc created for your acct in the us-east-1 region
+    try:
+        response = ec2_client.create_security_group( #creates the security group
+            GroupName='EC2_DEMO',
+            Description='SSH Access',
+            VpcId=vpc_id)
+        security_group_id = response['GroupId']
+        print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id)) 
+
+        response = ec2_client.authorize_security_group_ingress( #creates ssh rule & attachess to security group
+            GroupId=security_group_id,
+            IpPermissions=[
+                {'IpProtocol': 'tcp',
+                'FromPort': 22,
+                'ToPort': 22,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
+            ])
+        print('Ingress Successfully Set %s')  
+    except ClientError as e:
+        print(e)
+    return security_group_id
+
+def create_ec2_resource(): #Connects to the ec2 boto3 client with Demo IAM User. 
+                           #Change EC2-Admin to your AWS profile name
  
     print("Attempting to create ec2 resource on region: %s" % REGION)
  
@@ -89,8 +127,7 @@ def launch_ec2_instance():
         networkInterfaces = [
             {
                 'DeviceIndex': 0,
-                'SubnetId': SUBNET_ID,
-                'Groups': [SECURITY_GROUPS_IDS],
+                'Groups': [ec2_security_group()],
                 'AssociatePublicIpAddress': True,
                 'DeleteOnTermination': True
             }, ]
@@ -98,42 +135,31 @@ def launch_ec2_instance():
                                         InstanceType=INSTANCE_TYPE,
                                         NetworkInterfaces=networkInterfaces,
                                         UserData=USERDATA_SCRIPT,
-                                        MinCount=1, MaxCount=1,
+                                        MinCount=min_count, MaxCount=max_count,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
     else:
         instance = ec2.create_instances(ImageId=AMI_IMAGE_ID,
                                         InstanceType=INSTANCE_TYPE,
-                                        SubnetId=SUBNET_ID,
-                                        SecurityGroupIds=SECURITY_GROUPS_IDS,
+                                        SecurityGroupIds=[ec2_security_group()],
                                         UserData=USERDATA_SCRIPT,
-                                        MinCount=1, MaxCount=1,
+                                        MinCount=min_count, MaxCount=max_count,
                                         KeyName=KEY_PAIR_NAME,
                                         BlockDeviceMappings=blockDeviceMappings)
     if instance is None:
         raise Exception("Failed to create instance! Check the AWS console to verify creation or try again")
  
-    print("Instance created and launched successfully!")
-    print("#### Instance id: " + instance[0].id)
- 
+    print(f'''
+    |-----------------------------------------------------------|
+    |                                                           |
+    |Instance created and launched successfully!                |
+    |Instance id: {instance[0].id}                            |
+    |Run the following command: export EC2_ID={instance[0].id}|
+    |-----------------------------------------------------------|
+    ''')
     assign_tags_to_instance(ec2, instance[0].id)
     assign_tags_to_volume(instance[0])
     return instance[0]
- 
 
 if __name__ == "__main__":
     launch_ec2_instance()
-
-
-#tried bash but variables don't set correctly. subprocess is still new to me. doesn't execute at face value.
-# CMD = 'export EC2_ID=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=ec2demouser" --query "Reservations[*].Instances[*].InstanceId" --output text)'
-# os.system(CMD)
-# sleep(5)
-
-# CMD_2 = 'export EC2_IP=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=ec2demouser" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)'
-# os.system(CMD_2)
-# print("Environment Variables Set!!")
-
-# ec2_id = ['export EC2_ID=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=ec2demouser1" --query "Reservations[*].Instances[*].InstanceId" --output text)']
-# process = subprocess.Popen(ec2_id, stdout=subprocess.PIPE)
-# output, error = process.communicate()
