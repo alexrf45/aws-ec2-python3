@@ -38,7 +38,7 @@ def create_key_pair():
         TagSpecifications=[{'ResourceType': 'key-pair','Tags': [{'Key': 'Name','Value': 'ec2-demo'},]},] )
         # print({key_pair.key_material})
     outfile.write(f"{key_pair.key_material}")
-
+    # Consider adding a print KeyName statement and return it as variable that can be used in the launch_ec2_instance()
 
 create_key_pair()
 
