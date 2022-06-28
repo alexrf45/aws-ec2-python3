@@ -16,9 +16,8 @@ OWNER = 'ec2demouser' #tag
 RUNID = 'ec2-1' #tag
 PUBLIC_IP = None
 KEY_PAIR_NAME= 'ec2-demo'
-USERDATA_SCRIPT = '''
-#!/bin/bash
-sudo apt-get update && sudo apt-get install -y wget git python3 nginx certbot
+USERDATA_SCRIPT = '''#!/bin/bash
+apt-get update && apt-get install -y wget git python3 nginx certbot
 # Install Docker on ec2 instance:
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
