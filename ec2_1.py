@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import boto3
+import boto3auth
 from botocore.exceptions import ClientError
 from time import sleep #allows script execution to pause as AWS CLI execution on AWS servers are not always instant. 
 import os
@@ -21,7 +22,7 @@ apt-get update && apt-get install -y wget git python3 nginx certbot
 # Install Docker on ec2 instance:
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
-sudo usermod -aG docker $USER
+sudo usermod -aG docker $USER && . $HOME/.bashrc
 '''
 min_count = 1 #Minimum number of ec2 instances created
 max_count = 1 #Maximum number of ec2 instances created
@@ -73,10 +74,8 @@ def create_ec2_resource(): #Connects to the ec2 boto3 client with Demo IAM User.
  
     print("Attempting to create ec2 resource on region: %s" % REGION)
  
-    session = boto3.Session(region_name = REGION, profile_name='EC2-Admin')
-    # session = boto3.Session(region_name=REGION)
- 
-    ec2 = session.resource('ec2')
+    session = boto3auth.Boto3Auth()
+    ec2 = session.auth('ec2')
  
     if ec2 is None:
         raise ConnectionError("Could not create ec2 resource!")
