@@ -22,7 +22,8 @@ apt-get update && apt-get install -y wget git python3 nginx certbot
 # Install Docker on ec2 instance:
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
-sudo usermod -aG docker $USER && . $HOME/.bashrc
+sudo usermod -aG docker $USER
+. ~/.bashrc
 '''
 min_count = 1 #Minimum number of ec2 instances created
 max_count = 1 #Maximum number of ec2 instances created
