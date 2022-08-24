@@ -1,5 +1,6 @@
-# aws-ec2-python3
-Two simple Python3 scripts designed to spin up an EC2 instance and delete it.
+# aws-ec2-python3 Demo
 
-Check out https://cyber-ram.com/creating-an-ec2-instance-using-python3/ for a how-to. 
+***Four simple Python3 scripts designed to spin up tools, create an EC2 instance, delete it and an example diagram generated through code.
+
+Check out [Cyber-Ram])https://cyber-ram.com) for the walkthrough. 
 
