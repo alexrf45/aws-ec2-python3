@@ -3,13 +3,16 @@ A simple script for creating an ec2 instance with a security group and key pair
 """
 
 #!/usr/bin/env python3
+import logging
 from time import sleep # allows script execution to pause as AWS CLI execution
                        # on AWS servers are not always instant.
 import boto3
 import boto3auth
 from botocore.exceptions import ClientError
 
-
+logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s: %(levelname)s: %(message)s')
 
 REGION = 'us-east-1'
 AMI_IMAGE_ID = 'ami-07d02ee1eeb0c996c'
@@ -55,8 +58,6 @@ def create_key_pair():
     # Consider adding a print KeyName statement and return
     # it as variable that can be used in the launch_ec2_instance()
 
-create_key_pair()
-
 #Reference:
 # https://www.edureka.co/community/87793/create-a-security-group-and-rules-using-boto3-module
 
@@ -84,7 +85,7 @@ def ec2_security_group():
                 'ToPort': 22,
                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
             ])
-        print('Ingress Successfully Set %s')
+        print('Ingress Successfully Set')
     except ClientError as client_error:
         print(client_error)
     return security_group_id
@@ -94,7 +95,7 @@ def create_ec2_resource():
     Connects to the ec2 boto3 client with Demo IAM User.
     Change EC2-Admin to your AWS profile name
     """
-    print(f'Attempting to create ec2 resource on region: {REGION}')
+    logger.info('Attempting to create ec2 resource on region: %s', REGION)
 
     session = boto3auth.Boto3Auth()
     ec2 = session.auth('ec2')
@@ -142,7 +143,7 @@ def launch_ec2_instance():
 
     ec2 = create_ec2_resource()
 
-    block_device_mappings = [
+    BlockDeviceMappings = [
         {
             'DeviceName': DEVICE_NAME,
             'Ebs': {
@@ -155,7 +156,7 @@ def launch_ec2_instance():
 
     # Create Elastic/Public IP for instance
     if PUBLIC_IP:
-        network_interfaces = [
+        NetworkInterfaces = [
             {
                 'DeviceIndex': 0,
                 'Groups': [ec2_security_group()],
@@ -164,11 +165,11 @@ def launch_ec2_instance():
             }, ]
         instance = ec2.create_instances(ImageId=AMI_IMAGE_ID,
                                         InstanceType=INSTANCE_TYPE,
-                                        network_interfaces=network_interfaces,
+                                        NetworkInterfaces=NetworkInterfaces,
                                         UserData=USERDATA_SCRIPT,
                                         MinCount=MIN_COUNT, MaxCount=MAX_COUNT,
                                         KeyName=KEY_PAIR_NAME,
-                                        block_device_mappings=block_device_mappings)
+                                        BlockDeviceMappings=BlockDeviceMappings)
     else:
         instance = ec2.create_instances(ImageId=AMI_IMAGE_ID,
                                         InstanceType=INSTANCE_TYPE,
@@ -176,23 +177,27 @@ def launch_ec2_instance():
                                         UserData=USERDATA_SCRIPT,
                                         MinCount=MIN_COUNT, MaxCount=MAX_COUNT,
                                         KeyName=KEY_PAIR_NAME,
-                                        block_device_mappings=block_device_mappings)
+                                        BlockDeviceMappings=BlockDeviceMappings)
     if instance is None:
         raise Exception("""
         Failed to create instance! Check the AWS console to verify creation or try again
         """)
 
-    print(f'''
-    |-----------------------------------------------------------|
-    |                                                           |
-    |Instance created and launched successfully!                |
-    |Instance id: {instance[0].id}                            |
-    |Run the following command: export EC2_ID={instance[0].id}|
-    |-----------------------------------------------------------|
-    ''')
+    # print(f'''
+    # |-----------------------------------------------------------|
+    # |                                                           |
+    # |Instance created and launched successfully!                |
+    # |Instance id: {instance[0].id}                            |
+    # |Run the following command: export EC2_ID={instance[0].id}|
+    # |-----------------------------------------------------------|
+    # ''')
+    logger.info('Instance created and launched successfully!')
+    logger.info('Instance id: %s', instance[0].id)
+    logger.info('Run the following command: export EC2_ID=%s', instance[0].id)
     assign_tags_to_instance(ec2, instance[0].id)
     assign_tags_to_volume(instance[0])
     return instance[0]
 
 if __name__ == "__main__":
+    create_key_pair()
     launch_ec2_instance()
