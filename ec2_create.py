@@ -90,6 +90,7 @@ def ec2_security_group():
         print(client_error)
     return security_group_id
 
+
 def create_ec2_resource():
     """
     Connects to the ec2 boto3 client with Demo IAM User.
@@ -111,7 +112,7 @@ def assign_tags_to_instance(ec2, instance_id):
     Assigns tags to the ec2 instance.
     """
     print("Waiting for instance to be ready ...")
-    sleep(7)
+    sleep(3)
     print("Assigning tags to instance " + instance_id)
 
     ec2.create_tags(Resources=[instance_id], Tags=[{'Key': 'Name', 'Value': NAME},
@@ -128,7 +129,7 @@ def assign_tags_to_volume(instance):
     volumes = instance.volumes.all()
 
     print("Waiting for volume to be attached ...")
-    sleep(7)
+    sleep(3)
     for volume in volumes:
         print(f'Assigning tags to volume {volume.id}')
         volume.create_tags(Tags=[{'Key': 'Name', 'Value': NAME},
